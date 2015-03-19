@@ -45,6 +45,7 @@
 #include <linux/poll.h>
 #include <linux/irq_work.h>
 #include <linux/utsname.h>
+#include "printk_interface.h"
 
 #include <asm/uaccess.h>
 #ifdef CONFIG_SEC_DEBUG
@@ -1559,6 +1560,12 @@ asmlinkage int vprintk_emit(int facility, int level,
 	int this_cpu;
 	int printed_len = 0;
 
+	// if printk mode is disabled, terminate instantly
+	if (printk_mode == 0)
+	{
+	return 0;
+	}
+
 	boot_delay_msec(level);
 	printk_delay();
 
@@ -2018,6 +2025,12 @@ asmlinkage int printk(const char *fmt, ...)
 {
 	va_list args;
 	int r;
+
+	// if printk mode is disabled, terminate instantly
+	if (printk_mode == 0)
+	{
+	return 0;
+	}
 
 #ifdef CONFIG_KGDB_KDB
 	if (unlikely(kdb_trap_printk)) {
